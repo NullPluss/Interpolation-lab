@@ -1,31 +1,35 @@
+from functions import divided_diff
+from functions import newton_poly
+from functions import func
 import numpy as np
+import matplotlib.pyplot as plt
+import math
 
-def _poly_newton_coefficient(x, y):
-    """
-    x: list or np array contanining x data points
-    y: list or np array contanining y data points
-    """
+plt.style.use('seaborn-poster')
 
-    m = len(x)
+a = -3
+b = 3
+n = 5
+arr_x = []
+arr_f = []
 
-    x = np.copy(x)
-    a = np.copy(y)
-    for k in range(1, m):
-        a[k:m] = (a[k:m] - a[k - 1])/(x[k:m] - x[k - 1])
+for i in range(1, n+1):
+    arr_x.append((a+b)*0.5 + (b-a)*math.cos(((2*i-1)/n)*math.pi)*0.5)
 
-    return a
+for j in range(n):
+    arr_f.append(func(arr_x[j]))
 
-def newton_polynomial(x_data, y_data, x):
-    """
-    x_data: data points at x
-    y_data: data points at y
-    x: evaluation point(s)
-    """
-    a = _poly_newton_coefficient(x_data, y_data)
-    n = len(x_data) - 1  # Degree of polynomial
-    p = a[n]
+x = np.array(arr_x)
+y = np.array(arr_f)
+# get the divided difference coef
+a_s = divided_diff(x, y)[0, :]
 
-    for k in range(1, n + 1):
-        p = a[n - k] + (x - x_data[n - k])*p
+# evaluate on new data points
+x_new = np.arange(-4, 4, .1)
+y_new = newton_poly(a_s, x, x_new)
 
-    return p
+plt.figure(figsize = (12, 8))
+plt.plot(x, y, 'bo')
+plt.plot(x_new, y_new)
+plt.axis((-4, 4, -4, 4))
+plt.show()
